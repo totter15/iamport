@@ -53,11 +53,43 @@ function App() {
     //서버에 빌링키 발급 요청
   };
 
+  const requestKey = () => {
+    IMP.request_pay(
+      {
+        pg: "html5_inicis.INIBillTst", // 실제 계약 후에는 실제 상점아이디로 변경
+        pay_method: "card", // 'card'만 지원됩니다.
+        merchant_uid: "order_monthly_0001", // 상점에서 관리하는 주문 번호
+        name: "노르웨이 회전 의자", //주문명
+        amount: 100, //결제할 금액(필수)
+        customer_uid: "gildong_0001_1234", // 카드(빌링키)와 1:1로 대응하는 값
+        buyer_email: "totter@arcaneofficial.com",
+        buyer_name: "홍길동",
+        buyer_tel: "010-4209-2579", //주문자 연락처(필수)
+        m_redirect_url: "{모바일에서 결제 완료 후 리디렉션 될 URL}", // 예: https://www.my-service.com/payments/complete/mobile
+      },
+      (response) => {
+        console.log(response, "빌링키 발급");
+        if (response.success) {
+          //빌링키 발급 성공
+          //서버로 customer_uid보내기
+        } else {
+          //빌링키 발급 실패
+          alert("결제에 실패하였습니다.error:" + response.error_msg);
+        }
+      }
+    );
+  };
+
   return (
     <div className="App">
       <h1>주문페이지</h1>
       <button onClick={requestPay}>일반 결제하기</button>
-      <section style={{ marginTop: 40 }}>
+      <section>
+        <h2>REST API정기결제</h2>
+        <p>
+          서버가 아임포트 REST API를 사용하여 아임포트 서버에 카드정보를
+          전달하면, 아임포트 서버가 PG사의 API를 호출하여 빌링키를 발급
+        </p>
         <form onSubmit={onSubmit}>
           <label>
             카드번호
@@ -90,8 +122,16 @@ function App() {
               onChange={onChange}
             />
           </label>
-          <input type="submit" value="정기 결제하기" />
+          <button style={{ alignSelf: "center" }}>정기 결제하기</button>
         </form>
+      </section>
+
+      <section>
+        <h2>일반 결제창 정기결제</h2>
+        <p>
+          PG사가 제공하는 일반 결제창에 고객이 카드정보를 입력하여 빌링키를 발급
+        </p>
+        <button onClick={requestKey}>정기 결제하기</button>
       </section>
     </div>
   );
