@@ -1,4 +1,5 @@
 import "./App.css";
+import { useState } from "react";
 
 let IMP = window.IMP;
 IMP.init("imp60093857"); //가맹점 번호
@@ -7,6 +8,20 @@ IMP.init("imp60093857"); //가맹점 번호
 //결제 프로세스 완료 수 해당 주문번호를 서버에서 조회하여 결제 위변조 여부를 검증하는데 필요
 
 function App() {
+  const [value, setValue] = useState({
+    cardNumber: "",
+    expiry: "",
+    birth: "", //사업자 번호
+    pwd2Digit: "",
+    customer_uid: "gildong_0001_1234",
+  });
+
+  const { cardNumber, expiry, birth, pwd2Digit } = value;
+
+  const onChange = (e) => {
+    setValue({ ...value, [e.target.name]: e.target.value });
+  };
+
   const requestPay = () => {
     IMP.request_pay(
       {
@@ -33,10 +48,51 @@ function App() {
     );
   };
 
+  const onSubmit = (e) => {
+    e.preventDefault();
+    //서버에 빌링키 발급 요청
+  };
+
   return (
     <div className="App">
       <h1>주문페이지</h1>
-      <button onClick={requestPay}>결제하기</button>
+      <button onClick={requestPay}>일반 결제하기</button>
+      <section style={{ marginTop: 40 }}>
+        <form onSubmit={onSubmit}>
+          <label>
+            카드번호
+            <input
+              type="text"
+              name="cardNumber"
+              value={cardNumber}
+              onChange={onChange}
+            />
+          </label>
+          <label>
+            카드 유효기간
+            <input
+              type="text"
+              name="expiry"
+              value={expiry}
+              onChange={onChange}
+            />
+          </label>
+          <label>
+            생년월일
+            <input type="text" name="birth" value={birth} onChange={onChange} />
+          </label>
+          <label>
+            카드 비밀번호 앞 두자리
+            <input
+              type="text"
+              name="pwd2Digit"
+              value={pwd2Digit}
+              onChange={onChange}
+            />
+          </label>
+          <input type="submit" value="정기 결제하기" />
+        </form>
+      </section>
     </div>
   );
 }
